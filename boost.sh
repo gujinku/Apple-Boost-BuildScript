@@ -37,8 +37,8 @@ CLEAN=
 NO_CLEAN=
 NO_FRAMEWORK=
 
-BOOST_VERSION=1.61.0
-BOOST_VERSION2=1_61_0
+BOOST_VERSION=1.62.0
+BOOST_VERSION2=1_62_0
 
 MIN_IOS_VERSION=8.0
 IOS_SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
@@ -400,7 +400,7 @@ updateBoost()
     if [[ "$1" == "iOS" ]]; then
         cat > "$BOOST_SRC/tools/build/src/user-config.jam" <<EOF
 using darwin : ${IOS_SDK_VERSION}~iphone
-: $COMPILER -arch armv7 -arch arm64 $EXTRA_IOS_FLAGS
+: $COMPILER -arch armv6 -arch armv7 -arch armv7s -arch arm64 $EXTRA_IOS_FLAGS
 : <striper> <root>$XCODE_ROOT/Platforms/iPhoneOS.platform/Developer
 : <architecture>arm <target-os>iphone
 ;
@@ -572,7 +572,9 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
     if [[ -n $BUILD_IOS ]]; then
         # iOS Device
         mkdir -p "$IOSBUILDDIR/armv7/obj"
-        mkdir -p "$IOSBUILDDIR/arm64/obj"
+        mkdir -p "$IOSBUILDDIR/armv7s/obj"
+        mkdir -p "$IOSBUILDDIR/armv6/obj"
+        mkdir -p "$IOSBUILDDIR/armv64/obj"
 
         # iOS Simulator
         mkdir -p "$IOSBUILDDIR/i386/obj"
@@ -608,6 +610,10 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
         if [[ -n $BUILD_IOS ]]; then
             $IOS_ARM_DEV_CMD lipo "iphone-build/stage/lib/libboost_$NAME.a" \
                 -thin armv7 -o "$IOSBUILDDIR/armv7/libboost_$NAME.a"
+            $IOS_ARM_DEV_CMD lipo "iphone-build/stage/lib/libboost_$NAME.a" \
+                -thin armv7s -o "$IOSBUILDDIR/armv7s/libboost_$NAME.a"
+            $IOS_ARM_DEV_CMD lipo "iphone-build/stage/lib/libboost_$NAME.a" \
+                -thin armv6 -o "$IOSBUILDDIR/armv6/libboost_$NAME.a"
             $IOS_ARM_DEV_CMD lipo "iphone-build/stage/lib/libboost_$NAME.a" \
                 -thin arm64 -o "$IOSBUILDDIR/arm64/libboost_$NAME.a"
 
@@ -648,6 +654,8 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
         echo "Decomposing libboost_${NAME}.a"
         if [[ -n $BUILD_IOS ]]; then
             unpackArchive "$IOSBUILDDIR/armv7/obj" $NAME
+            unpackArchive "$IOSBUILDDIR/armv7s/obj" $NAME
+            unpackArchive "$IOSBUILDDIR/arm6/obj" $NAME
             unpackArchive "$IOSBUILDDIR/arm64/obj" $NAME
             unpackArchive "$IOSBUILDDIR/i386/obj" $NAME
             unpackArchive "$IOSBUILDDIR/x86_64/obj" $NAME
@@ -693,6 +701,10 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
         if [[ -n $BUILD_IOS ]]; then
             echo ...armv7
             (cd "$IOSBUILDDIR/armv7"; $IOS_ARM_DEV_CMD ar crus libboost.a obj/$NAME/*.o; )
+            echo ...armv7s
+            (cd "$IOSBUILDDIR/armv7s"; $IOS_ARM_DEV_CMD ar crus libboost.a obj/$NAME/*.o; )
+            echo ...armv6
+            (cd "$IOSBUILDDIR/armv6"; $IOS_ARM_DEV_CMD ar crus libboost.a obj/$NAME/*.o; )
             echo ...arm64
             (cd "$IOSBUILDDIR/arm64"; $IOS_ARM_DEV_CMD ar crus libboost.a obj/$NAME/*.o; )
 
