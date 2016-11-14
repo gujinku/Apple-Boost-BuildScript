@@ -574,7 +574,7 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
         mkdir -p "$IOSBUILDDIR/armv7/obj"
         mkdir -p "$IOSBUILDDIR/armv7s/obj"
         mkdir -p "$IOSBUILDDIR/armv6/obj"
-        mkdir -p "$IOSBUILDDIR/armv64/obj"
+        mkdir -p "$IOSBUILDDIR/arm64/obj"
 
         # iOS Simulator
         mkdir -p "$IOSBUILDDIR/i386/obj"
@@ -655,7 +655,7 @@ scrunchAllLibsTogetherInOneLibPerPlatform()
         if [[ -n $BUILD_IOS ]]; then
             unpackArchive "$IOSBUILDDIR/armv7/obj" $NAME
             unpackArchive "$IOSBUILDDIR/armv7s/obj" $NAME
-            unpackArchive "$IOSBUILDDIR/arm6/obj" $NAME
+            unpackArchive "$IOSBUILDDIR/armv6/obj" $NAME
             unpackArchive "$IOSBUILDDIR/arm64/obj" $NAME
             unpackArchive "$IOSBUILDDIR/i386/obj" $NAME
             unpackArchive "$IOSBUILDDIR/x86_64/obj" $NAME
